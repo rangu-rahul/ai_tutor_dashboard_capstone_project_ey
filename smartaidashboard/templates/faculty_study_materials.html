@@ -1,0 +1,461 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Materials | Smart AI Tutor</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #818cf8;
+            --bg-color: #f3f4f6;
+            --text-color: #1f2937;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: var(--card-bg);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--primary-color);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .action-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .action-btn:hover {
+            background-color: #4338ca;
+        }
+
+        .upload-form {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 3rem;
+            display: none;
+        }
+
+        .upload-form.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            padding: 0.8rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .material-card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .material-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .file-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .material-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .material-meta {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            border-radius: 0.3rem;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .btn-view {
+            background: #eef2ff;
+            color: var(--primary-color);
+        }
+
+        .btn-view:hover {
+            background: #e0e7ff;
+        }
+
+        .btn-delete-sm {
+            color: var(--danger);
+            background: #fef2f2;
+        }
+
+        .btn-delete-sm:hover {
+            background: #fee2e2;
+        }
+
+        .filter-section {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .filter-chip {
+            padding: 0.5rem 1rem;
+            background: white;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: 1px solid #e5e7eb;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .filter-chip.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            text-align: center;
+            color: #6b7280;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--card-bg);
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: var(--shadow);
+            }
+
+            .nav-links.show {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="{% url 'faculty_home' %}" class="logo">
+                <span>🎓</span> Faculty Dashboard
+            </a>
+            <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="{% url 'faculty_home' %}">Home</a></li>
+                <li><a href="{% url 'faculty_attendance' %}">Attendance</a></li>
+                <li><a href="{% url 'faculty_assignments' %}">Assignments</a></li>
+                <li><a href="{% url 'faculty_study_materials' %}" class="active">Study Materials</a></li>
+                <li><a href="#" onclick="logout()">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Study Materials</h1>
+            <button class="action-btn" onclick="toggleForm()">+ Upload Material</button>
+        </div>
+
+        <div class="upload-form" id="uploadForm">
+            <h2 style="margin-bottom: 1.5rem;">Upload New Material</h2>
+            <form>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Course</label>
+                        <select class="form-select">
+                            <option>Web Development</option>
+                            <option>Data Structures</option>
+                            <option>Database Management</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Material Type</label>
+                        <select class="form-select">
+                            <option>Lecture Notes (PDF)</option>
+                            <option>Video Lecture</option>
+                            <option>Reference Book</option>
+                            <option>Code Sample</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Title</label>
+                        <input type="text" class="form-input" placeholder="e.g., Introduction to React Hooks">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>File Upload</label>
+                        <input type="file" class="form-input">
+                    </div>
+                </div>
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                    <button type="button" class="action-btn">Upload</button>
+                    <button type="button" class="btn-sm" style="border: 1px solid #d1d5db; background: transparent;"
+                        onclick="toggleForm()">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="filter-section">
+            <div class="filter-chip active">All Materials</div>
+            <div class="filter-chip">Web Development</div>
+            <div class="filter-chip">Data Structures</div>
+            <div class="filter-chip">Database Management</div>
+        </div>
+
+        <div class="materials-grid">
+            <!-- Material Card 1 -->
+            <div class="material-card">
+                <div class="file-icon">📄</div>
+                <h3 class="material-title">HTML5 & CSS3 Basics</h3>
+                <div class="material-meta">
+                    <p>Web Development</p>
+                    <p style="margin-top: 0.3rem;">Added: Mar 10, 2024</p>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-sm btn-view">Download</button>
+                    <button class="btn-sm btn-delete-sm">Delete</button>
+                </div>
+            </div>
+
+            <!-- Material Card 2 -->
+            <div class="material-card">
+                <div class="file-icon">🎥</div>
+                <h3 class="material-title">Binary Trees Lecture</h3>
+                <div class="material-meta">
+                    <p>Data Structures</p>
+                    <p style="margin-top: 0.3rem;">Added: Mar 12, 2024</p>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-sm btn-view">Watch</button>
+                    <button class="btn-sm btn-delete-sm">Delete</button>
+                </div>
+            </div>
+
+            <!-- Material Card 3 -->
+            <div class="material-card">
+                <div class="file-icon">💻</div>
+                <h3 class="material-title">SQL Joins Cheatsheet</h3>
+                <div class="material-meta">
+                    <p>Database Management</p>
+                    <p style="margin-top: 0.3rem;">Added: Mar 15, 2024</p>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-sm btn-view">Download</button>
+                    <button class="btn-sm btn-delete-sm">Delete</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2024 Smart AI Tutor. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('show');
+        }
+
+        function toggleForm() {
+            const form = document.getElementById('uploadForm');
+            form.classList.toggle('show');
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = "{% url 'dashboard' %}";
+            }
+        }
+
+        // Filter functionality (visual only for basic frontend)
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', function () {
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,208 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Materials - Smart AI Tutor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: clamp(1rem, 3vw, 2rem);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            border-radius: 15px;
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h1 {
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+
+        .btn-game {
+            background: #667eea;
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .btn-game:hover {
+            transform: translateY(-2px);
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            margin-bottom: 2rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .filter-chip {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            white-space: nowrap;
+            transition: background 0.3s;
+        }
+
+        .filter-chip.active,
+        .filter-chip:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .material-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .material-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .icon-wrapper {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: #eef2ff;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .card-subtitle {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-download {
+            display: block;
+            width: 100%;
+            padding: 0.7rem;
+            background: #ebf4ff;
+            color: #4299e1;
+            text-align: center;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn-download:hover {
+            background: #bee3f8;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <h1>📚 Study Materials</h1>
+            </div>
+            <div>
+                <a href="{% url 's_home' %}" class="btn-game">Dashboard</a>
+            </div>
+        </header>
+
+        <div class="filters">
+            <div class="filter-chip active">All Materials</div>
+            <div class="filter-chip">Lecture Notes</div>
+            <div class="filter-chip">Video Tutorials</div>
+            <div class="filter-chip">Reference Books</div>
+            <div class="filter-chip">Assignments</div>
+        </div>
+
+        <div class="materials-grid">
+            <!-- Material 1 -->
+            <div class="material-card">
+                <div class="icon-wrapper">📄</div>
+                <h3 class="card-title">Introduction to React</h3>
+                <p class="card-subtitle">Web Development • PDF • 2.5 MB</p>
+                <a href="#" class="btn-download">Download PDF</a>
+            </div>
+
+            <!-- Material 2 -->
+            <div class="material-card">
+                <div class="icon-wrapper">🎥</div>
+                <h3 class="card-title">Sorting Algorithms Visualized</h3>
+                <p class="card-subtitle">Data Structures • Video • 15 Mins</p>
+                <a href="#" class="btn-download">Watch Video</a>
+            </div>
+
+            <!-- Material 3 -->
+            <div class="material-card">
+                <div class="icon-wrapper">📘</div>
+                <h3 class="card-title">Clean Code Handbook</h3>
+                <p class="card-subtitle">Software Engineering • E-Book • 12 MB</p>
+                <a href="#" class="btn-download">Download Book</a>
+            </div>
+            <!-- Material 4 -->
+            <div class="material-card">
+                <div class="icon-wrapper">📄</div>
+                <h3 class="card-title">SQL Cheat Sheet</h3>
+                <p class="card-subtitle">Database Mgmt • PDF • 1.2 MB</p>
+                <a href="#" class="btn-download">Download PDF</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

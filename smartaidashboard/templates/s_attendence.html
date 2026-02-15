@@ -1,0 +1,273 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Attendance - Smart AI Tutor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: clamp(1rem, 3vw, 2rem);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header & Nav (Consistent with s_home) */
+        header {
+            background: white;
+            border-radius: 15px;
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h1 {
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+
+        .btn-game {
+            background: #667eea;
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .btn-game:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Attendance Content */
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            color: #2d3748;
+            font-size: 1.8rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            outline: none;
+            color: #4a5568;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Responsive Table */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        th {
+            background: #f7fafc;
+            padding: 1rem;
+            text-align: left;
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-top: 1px solid #e2e8f0;
+            color: #2d3748;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-present {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-absent {
+            background: #fed7d7;
+            color: #822727;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .content-card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <h1>📅 Attendance Tracker</h1>
+            </div>
+            <div>
+                <a href="{% url 's_home' %}" class="btn-game">Dashboard</a>
+            </div>
+        </header>
+
+        <div class="content-card">
+            <div class="page-header">
+                <h2 class="page-title">Attendance Overview</h2>
+                <div class="filters">
+                    <select class="filter-select">
+                        <option>All Courses</option>
+                        <option>Web Development</option>
+                        <option>Data Structures</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>February 2026</option>
+                        <option>January 2026</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">85%</div>
+                    <div class="stat-label">Overall Attendance</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Classes Attended</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: #e53e3e">2</div>
+                    <div class="stat-label">Classes Missed</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Course</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Feb 15, 2026</td>
+                            <td>Web Development</td>
+                            <td>10:00 AM</td>
+                            <td><span class="status-badge status-present">Present</span></td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>Feb 14, 2026</td>
+                            <td>Data Structures</td>
+                            <td>02:00 PM</td>
+                            <td><span class="status-badge status-present">Present</span></td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>Feb 12, 2026</td>
+                            <td>Database Mgmt</td>
+                            <td>11:00 AM</td>
+                            <td><span class="status-badge status-absent">Absent</span></td>
+                            <td>Sick Leave</td>
+                        </tr>
+                        <tr>
+                            <td>Feb 10, 2026</td>
+                            <td>Web Development</td>
+                            <td>10:00 AM</td>
+                            <td><span class="status-badge status-present">Present</span></td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,401 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ course.title }} - Smart AI Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: clamp(1rem, 3vw, 2rem);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            border-radius: clamp(10px, 2vw, 15px);
+            padding: clamp(1.25rem, 3vw, 2rem);
+            margin-bottom: clamp(1.25rem, 3vw, 2rem);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo h1 {
+            color: #667eea;
+            font-size: clamp(1.25rem, 3vw, 1.75rem);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #718096;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4a5568;
+            transform: translateY(-2px);
+        }
+
+        /* Course Detail */
+        .course-detail {
+            background: white;
+            border-radius: clamp(10px, 2vw, 15px);
+            padding: clamp(1.5rem, 4vw, 3rem);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .course-header {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .course-category {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.5rem 1.25rem;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .course-title {
+            color: #2d3748;
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .course-meta {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            color: #718096;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            margin-bottom: 1rem;
+        }
+
+        .course-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .enrollment-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #48bb78;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .course-content {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            color: #2d3748;
+            font-size: clamp(1.25rem, 3vw, 1.5rem);
+            margin-bottom: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .course-description {
+            color: #4a5568;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            padding: 1.5rem;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .info-card h4 {
+            color: #667eea;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .info-card p {
+            color: #4a5568;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .progress-section {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .progress-bar-container {
+            background: white;
+            border-radius: 25px;
+            height: 30px;
+            overflow: hidden;
+            margin-top: 1rem;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: width 0.5s ease;
+        }
+
+        .grade-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-top: 1rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .course-meta {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 0.75rem;
+            }
+
+            .course-detail {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <h1>🎓 Smart AI Tutor</h1>
+            </div>
+            <div class="header-actions">
+                <a href="{% url 's_courses' %}" class="btn btn-secondary">← Back to Courses</a>
+                <a href="{% url 's_home' %}" class="btn btn-primary">Dashboard</a>
+                <a href="{% url 's_profile' %}" class="btn btn-primary">Profile</a>
+            </div>
+        </header>
+
+        <div class="course-detail">
+            <div class="course-header">
+                <span class="course-category">{{ course.category }}</span>
+                <h1 class="course-title">{{ course.title }}</h1>
+                <div class="course-meta">
+                    <div class="course-meta-item">
+                        <span>👨‍🏫</span>
+                        <span><strong>Instructor:</strong> {{ course.instructor }}</span>
+                    </div>
+                    <div class="course-meta-item">
+                        <span>⏱️</span>
+                        <span><strong>Duration:</strong> {{ course.duration }}</span>
+                    </div>
+                    <div class="course-meta-item">
+                        <span>📊</span>
+                        <span><strong>Level:</strong> {{ course.level }}</span>
+                    </div>
+                    <div class="course-meta-item">
+                        <span>📅</span>
+                        <span><strong>Created:</strong> {{ course.created_at|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+                {% if enrollment %}
+                <div class="enrollment-status">
+                    <span>✓</span>
+                    <span>You are enrolled in this course</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="course-content">
+                <h2 class="section-title">📖 Course Description</h2>
+                <p class="course-description">{{ course.description }}</p>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>📚 Course Category</h4>
+                    <p>{{ course.category }}</p>
+                </div>
+                <div class="info-card">
+                    <h4>🎯 Difficulty Level</h4>
+                    <p>{{ course.level }}</p>
+                </div>
+                <div class="info-card">
+                    <h4>⏰ Time Commitment</h4>
+                    <p>{{ course.duration }}</p>
+                </div>
+                <div class="info-card">
+                    <h4>👨‍🏫 Instructor</h4>
+                    <p>{{ course.instructor }}</p>
+                </div>
+            </div>
+
+            {% if enrollment %}
+            <div class="progress-section">
+                <h2 class="section-title">📊 Your Progress</h2>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: {{ enrollment.progress }}%">
+                        {{ enrollment.progress }}%
+                    </div>
+                </div>
+                {% if enrollment.grade %}
+                <div style="margin-top: 2rem">
+                    <h3 class="section-title">🏆 Your Grade</h3>
+                    <div class="grade-badge">{{ enrollment.grade }}</div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <div class="action-buttons">
+                {% if enrollment %}
+                <a href="{% url 's_home' %}" class="btn btn-primary btn-large">
+                    Continue Learning
+                </a>
+                <a href="{% url 's_courses' %}" class="btn btn-secondary btn-large">
+                    Browse More Courses
+                </a>
+                {% else %}
+                <a href="#" class="btn btn-success btn-large">
+                    Enroll in This Course
+                </a>
+                <a href="{% url 's_courses' %}" class="btn btn-secondary btn-large">
+                    Browse More Courses
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

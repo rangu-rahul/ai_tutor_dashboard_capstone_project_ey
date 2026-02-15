@@ -1,0 +1,382 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Management | Smart AI Tutor</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #818cf8;
+            --bg-color: #f3f4f6;
+            --text-color: #1f2937;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: var(--card-bg);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--primary-color);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .action-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .action-btn:hover {
+            background-color: #4338ca;
+        }
+
+        .attendance-filters {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-select,
+        .form-input {
+            padding: 0.8rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .attendance-table-container {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-present {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-absent {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .action-icon {
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            text-align: center;
+            color: #6b7280;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--card-bg);
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: var(--shadow);
+            }
+
+            .nav-links.show {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="{% url 'faculty_home' %}" class="logo">
+                <span>🎓</span> Faculty Dashboard
+            </a>
+            <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="{% url 'faculty_home' %}">Home</a></li>
+                <li><a href="{% url 'faculty_attendance' %}" class="active">Attendance</a></li>
+                <li><a href="{% url 'faculty_assignments' %}">Assignments</a></li>
+                <li><a href="{% url 'faculty_study_materials' %}">Study Materials</a></li>
+                <li><a href="#" onclick="logout()">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Attendance Management</h1>
+            <button class="action-btn">Save Attendance</button>
+        </div>
+
+        <div class="attendance-filters">
+            <div class="form-group">
+                <label>Select Course</label>
+                <select class="form-select">
+                    <option>Web Development</option>
+                    <option>Data Structures</option>
+                    <option>Database Management</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Select Date</label>
+                <input type="date" class="form-input" value="2024-03-20">
+            </div>
+            <div class="form-group">
+                <label>Session</label>
+                <select class="form-select">
+                    <option>Morning (9:00 - 10:00)</option>
+                    <option>Afternoon (2:00 - 3:00)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="attendance-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>01</td>
+                        <td>K.NareshSagar</td>
+                        <td>
+                            <select class="form-select status-present" style="padding: 0.4rem;">
+                                <option value="present">Present</option>
+                                <option value="absent">Absent</option>
+                            </select>
+                        </td>
+                        <td><input type="text" class="form-input" placeholder="Optional remark"
+                                style="padding: 0.4rem;"></td>
+                    </tr>
+                    <tr>
+                        <td>02</td>
+                        <td>M.Krishna</td>
+                        <td>
+                            <select class="form-select status-present" style="padding: 0.4rem;">
+                                <option value="present">Present</option>
+                                <option value="absent">Absent</option>
+                            </select>
+                        </td>
+                        <td><input type="text" class="form-input" placeholder="Optional remark"
+                                style="padding: 0.4rem;"></td>
+                    </tr>
+                    <tr>
+                        <td>03</td>
+                        <td>MD.Rafath</td>
+                        <td>
+                            <select class="form-select status-absent" style="padding: 0.4rem;">
+                                <option value="absent">Absent</option>
+                                <option value="present">Present</option>
+                            </select>
+                        </td>
+                        <td><input type="text" class="form-input" placeholder="Sick Leave" style="padding: 0.4rem;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>04</td>
+                        <td>M.Anirudh</td>
+                        <td>
+                            <select class="form-select status-absent" style="padding: 0.4rem;">
+                                <option value="absent">Absent</option>
+                                <option value="present">Present</option>
+                            </select>
+                        </td>
+                        <td><input type="text" class="form-input" placeholder="Sick Leave" style="padding: 0.4rem;">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2024 Smart AI Tutor. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('show');
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = "{% url 'dashboard' %}";
+            }
+        }
+
+        // Add visual feedback for attendance status change
+        document.querySelectorAll('select').forEach(select => {
+            select.addEventListener('change', function () {
+                if (this.value === 'present') {
+                    this.className = 'form-select status-present';
+                } else if (this.value === 'absent') {
+                    this.className = 'form-select status-absent';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

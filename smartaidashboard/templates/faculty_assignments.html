@@ -1,0 +1,426 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Management | Smart AI Tutor</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #818cf8;
+            --bg-color: #f3f4f6;
+            --text-color: #1f2937;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: var(--card-bg);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--primary-color);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .action-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .action-btn:hover {
+            background-color: #4338ca;
+        }
+
+        .create-assignment-form {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 3rem;
+            display: none;
+            /* Hidden by default */
+        }
+
+        .create-assignment-form.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            padding: 0.8rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .assignments-list {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .assignment-card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .assignment-info h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .assignment-meta {
+            color: #6b7280;
+            font-size: 0.9rem;
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .assignment-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .assignment-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #d1d5db;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-outline:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .btn-delete {
+            color: var(--danger);
+            border-color: #fecaca;
+        }
+
+        .btn-delete:hover {
+            background: #fef2f2;
+            border-color: var(--danger);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            text-align: center;
+            color: #6b7280;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--card-bg);
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: var(--shadow);
+            }
+
+            .nav-links.show {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .assignment-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .assignment-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="{% url 'faculty_home' %}" class="logo">
+                <span>🎓</span> Faculty Dashboard
+            </a>
+            <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="{% url 'faculty_home' %}">Home</a></li>
+                <li><a href="{% url 'faculty_attendance' %}">Attendance</a></li>
+                <li><a href="{% url 'faculty_assignments' %}" class="active">Assignments</a></li>
+                <li><a href="{% url 'faculty_study_materials' %}">Study Materials</a></li>
+                <li><a href="#" onclick="logout()">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Assignment Management</h1>
+            <button class="action-btn" onclick="toggleForm()">+ Create New Assignment</button>
+        </div>
+
+        <div class="create-assignment-form" id="createForm">
+            <h2 style="margin-bottom: 1.5rem;">Create New Assignment</h2>
+            <form>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Course</label>
+                        <select class="form-select">
+                            <option>Web Development</option>
+                            <option>Data Structures</option>
+                            <option>Database Management</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Due Date</label>
+                        <input type="datetime-local" class="form-input">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Assignment Title</label>
+                        <input type="text" class="form-input" placeholder="e.g., Build a Responsive Portfolio">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Description</label>
+                        <textarea class="form-textarea"
+                            placeholder="Detailed instructions for the assignment..."></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>File Attachment (Optional)</label>
+                        <input type="file" class="form-input">
+                    </div>
+                </div>
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                    <button type="button" class="action-btn">Post Assignment</button>
+                    <button type="button" class="btn-outline" onclick="toggleForm()">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="assignments-list">
+            <!-- Assignment Card 1 -->
+            <div class="assignment-card">
+                <div class="assignment-info">
+                    <h3>Frontend Development Project</h3>
+                    <div class="assignment-meta">
+                        <span>📚 Web Development</span>
+                        <span>📅 Due: Mar 25, 2024</span>
+                        <span>👥 45 Submissions</span>
+                    </div>
+                    <p style="margin-top: 0.5rem; color: #4b5563;">Create a responsive landing page using HTML, CSS, and
+                        JavaScript.</p>
+                </div>
+                <div class="assignment-actions">
+                    <button class="btn-outline">View Submissions</button>
+                    <button class="btn-outline">Edit</button>
+                    <button class="btn-outline btn-delete">Delete</button>
+                </div>
+            </div>
+
+            <!-- Assignment Card 2 -->
+            <div class="assignment-card">
+                <div class="assignment-info">
+                    <h3>Binary Search Implementation</h3>
+                    <div class="assignment-meta">
+                        <span>📚 Data Structures</span>
+                        <span>📅 Due: Mar 28, 2024</span>
+                        <span>👥 12 Submissions</span>
+                    </div>
+                    <p style="margin-top: 0.5rem; color: #4b5563;">Implement binary search algorithm in Python and
+                        analyze time complexity.</p>
+                </div>
+                <div class="assignment-actions">
+                    <button class="btn-outline">View Submissions</button>
+                    <button class="btn-outline">Edit</button>
+                    <button class="btn-outline btn-delete">Delete</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2024 Smart AI Tutor. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('show');
+        }
+
+        function toggleForm() {
+            const form = document.getElementById('createForm');
+            form.classList.toggle('show');
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = "{% url 'dashboard' %}";
+            }
+        }
+    </script>
+</body>
+
+</html>
