@@ -1,0 +1,510 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Quiz Generator - Smart AI Tutor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles - Consistent with s_home.html */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        .logo h1 {
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-logout {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-logout:hover {
+            background: #e53e3e;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 101, 101, 0.4);
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            flex: 1;
+        }
+
+        nav a {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: #667eea;
+        }
+
+        nav a::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #667eea;
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after,
+        nav a.active::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #ebf4ff;
+            padding-bottom: 0.5rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            max-width: 800px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .quiz-container {
+            display: none;
+        }
+
+        .quiz-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .question-card {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid #667eea;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-label:hover {
+            border-color: #667eea;
+            background: #ebf4ff;
+        }
+
+        .option-label input {
+            margin-right: 10px;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loader.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .result-box {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .correct-answer {
+            color: #2f855a;
+            font-weight: bold;
+            display: none;
+            margin-top: 0.5rem;
+        }
+
+        .incorrect {
+            border-color: #f56565 !important;
+            background: #fff5f5 !important;
+        }
+
+        .correct {
+            border-color: #48bb78 !important;
+            background: #f0fff4 !important;
+        }
+
+        @media (max-width: 768px) {
+
+            header,
+            nav {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <img src="{% static 'smartaidashboard/logo.png' %}" alt="Logo" onerror="this.style.display='none'" />
+            <h1>Smart AI Tutor</h1>
+        </div>
+        <div class="header-actions">
+            <a href="{% url 's_profile' %}" class="btn btn-primary">Profile</a>
+            <a href="{% url 'logout' %}" class="btn btn-logout">Logout</a>
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="{% url 's_home' %}">Dashboard</a></li>
+            <li><a href="{% url 's_study_materials' %}">Study Materials</a></li>
+            <li><a href="{% url 's_upload_projects' %}">Upload Projects</a></li>
+            <li><a href="{% url 's_courses' %}">Courses</a></li>
+            <li><a href="{% url 's_assignments' %}">Assignments</a></li>
+            <li><a href="{% url 's_grades' %}">Grades</a></li>
+            <li><a href="{% url 's_attendance' %}">Attendence</a></li>
+            <li><a href="{% url 's_home' %}">AI Tutor</a></li>
+            <li><a href="#" class="active">Quizzes</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="card">
+            <h2>✨ AI Quiz Generator</h2>
+            <p style="margin-bottom: 2rem; color: #718096;">Enter any topic, subject, or concept, and our AI will
+                generate a custom quiz for you to test your knowledge.</p>
+
+            <div class="input-group">
+                <input type="text" id="topicInput"
+                    placeholder="Enter a topic (e.g., Python Lists, World War II, Photosynthesis)...">
+                <button class="btn btn-primary" onclick="generateQuiz()">Generate Quiz</button>
+            </div>
+
+            <div class="loader" id="loader">
+                <div class="spinner"></div>
+                <p>Generating your quiz... This may take a moment.</p>
+            </div>
+
+            <div id="quizContainer" class="quiz-container">
+                <!-- Quiz questions will be inserted here -->
+            </div>
+
+            <div id="submitBtnContainer" style="display: none; margin-top: 2rem; text-align: center;">
+                <button class="btn btn-primary" onclick="submitQuiz()">Submit Answers</button>
+            </div>
+
+            <div id="scoreDisplay" class="card"
+                style="display: none; margin-top: 2rem; text-align: center; background: #f0fff4; border: 2px solid #48bb78;">
+                <h3 style="color: #2f855a; margin-bottom: 0.5rem;">Quiz Results</h3>
+                <p id="scoreText" style="font-size: 1.2rem; font-weight: bold;"></p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentQuizData = [];
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                const cookies = document.cookie.split(";");
+                for (let cookie of cookies) {
+                    cookie = cookie.trim();
+                    if (cookie.startsWith(name + "=")) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        async function generateQuiz() {
+            const topic = document.getElementById('topicInput').value.trim();
+            if (!topic) {
+                alert("Please enter a topic first.");
+                return;
+            }
+
+            document.getElementById('loader').classList.add('active');
+            document.getElementById('quizContainer').classList.remove('active');
+            document.getElementById('submitBtnContainer').style.display = 'none';
+            document.getElementById('scoreDisplay').style.display = 'none';
+            document.getElementById('quizContainer').innerHTML = '';
+
+            try {
+                const response = await fetch("{% url 'generate_quiz' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCookie("csrftoken"),
+                    },
+                    body: JSON.stringify({ topic: topic }),
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    alert("Error: " + data.error);
+                    return;
+                }
+
+                currentQuizData = data.quiz;
+                renderQuiz(data.quiz);
+
+            } catch (err) {
+                console.error(err);
+                alert("Failed to generate quiz. Please try again.");
+            } finally {
+                document.getElementById('loader').classList.remove('active');
+            }
+        }
+
+        function renderQuiz(questions) {
+            const container = document.getElementById('quizContainer');
+
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-card';
+                questionDiv.innerHTML = `
+                    <div class="question-text">${index + 1}. ${q.question}</div>
+                    <div class="options-grid">
+                        ${q.options.map((opt, i) => `
+                            <label class="option-label" id="q${index}_opt${i}">
+                                <input type="radio" name="question${index}" value="${i}">
+                                ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div class="correct-answer" id="result${index}"></div>
+                `;
+                container.appendChild(questionDiv);
+            });
+
+            container.classList.add('active');
+            document.getElementById('submitBtnContainer').style.display = 'block';
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            const total = currentQuizData.length;
+
+            currentQuizData.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="question${index}"]:checked`);
+                const resultDiv = document.getElementById(`result${index}`);
+
+                // Reset styles
+                document.querySelectorAll(`input[name="question${index}"]`).forEach(inp => {
+                    inp.parentElement.classList.remove('correct', 'incorrect');
+                });
+
+                if (selected) {
+                    const selectedValue = parseInt(selected.value);
+                    if (selectedValue === q.correct_index) {
+                        score++;
+                        selected.parentElement.classList.add('correct');
+                        resultDiv.innerHTML = "✅ Correct!";
+                        resultDiv.style.color = "#48bb78";
+                    } else {
+                        selected.parentElement.classList.add('incorrect');
+                        document.getElementById(`q${index}_opt${q.correct_index}`).classList.add('correct');
+                        resultDiv.innerHTML = `❌ Incorrect. Correct answer: ${q.options[q.correct_index]}`;
+                        resultDiv.style.color = "#f56565";
+                    }
+                } else {
+                    document.getElementById(`q${index}_opt${q.correct_index}`).classList.add('correct');
+                    resultDiv.innerHTML = `⚠️ Not answered. Correct answer: ${q.options[q.correct_index]}`;
+                    resultDiv.style.color = "#ed8936";
+                }
+                resultDiv.style.display = 'block';
+            });
+
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const scoreText = document.getElementById('scoreText');
+            scoreText.textContent = `You scored ${score} out of ${total} (${Math.round((score / total) * 100)}%)`;
+            scoreDisplay.style.display = 'block';
+
+            // Scroll to results
+            scoreDisplay.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+
+</html>

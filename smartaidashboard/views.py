@@ -102,9 +102,12 @@ def s_profile(request):
     return render(request, 's_profile.html')
 
 
-def logout(request):
-    logout(request)
-    return render(request, 'user_login.html')
+from django.contrib.auth import logout as auth_logout
+
+def user_logout(request):
+    auth_logout(request)
+    return render(request, 'dashboard.html')
+
 
 
 def faculty_home(request):
@@ -159,79 +162,79 @@ class ChatbotInitAPIView(APIView):
         })
 
 
-class GeminiChatAPIView(APIView):
-    permission_classes = [AllowAny]
+# class GeminiChatAPIView(APIView):
+#     permission_classes = [AllowAny]
 
-    def post(self, request):
-        message = (request.data.get('message') or '').strip()
-        if not message:
-            return Response(
-                {"error": "Message is required."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+#     def post(self, request):
+#         message = (request.data.get('message') or '').strip()
+#         if not message:
+#             return Response(
+#                 {"error": "Message is required."},
+#                 status=status.HTTP_400_BAD_REQUEST,
+#             )
 
-        api_key = settings.GEMINI_API_KEY
-        if not api_key:
-            return Response(
-                {"error": "Server missing GEMINI_API_KEY."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+#         api_key = settings.GEMINI_API_KEY
+#         if not api_key:
+#             return Response(
+#                 {"error": "Server missing GEMINI_API_KEY."},
+#                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             )
 
-        url = (
-            "https://generativelanguage.googleapis.com/v1beta/models/"
-            "gemini-pro:generateContent?key="
-            f"{api_key}"
-        )
-        payload = {
-            "contents": [
-                {
-                    "parts": [
-                        {"text": message}
-                    ]
-                }
-            ]
-        }
-        request_data = json.dumps(payload).encode("utf-8")
-        api_request = urllib.request.Request(
-            url,
-            data=request_data,
-            headers={"Content-Type": "application/json"},
-            method="POST",
-        )
+#         url = (
+#             "https://generativelanguage.googleapis.com/v1beta/models/"
+#             "gemini-pro:generateContent?key="
+#             f"{api_key}"
+#         )
+#         payload = {
+#             "contents": [
+#                 {
+#                     "parts": [
+#                         {"text": message}
+#                     ]
+#                 }
+#             ]
+#         }
+#         request_data = json.dumps(payload).encode("utf-8")
+#         api_request = urllib.request.Request(
+#             url,
+#             data=request_data,
+#             headers={"Content-Type": "application/json"},
+#             method="POST",
+#         )
 
-        try:
-            with urllib.request.urlopen(api_request, timeout=20) as response:
-                body = response.read().decode("utf-8")
-            data = json.loads(body)
-        except urllib.error.HTTPError as exc:
-            error_body = ""
-            try:
-                error_body = exc.read().decode("utf-8")
-            except Exception:
-                error_body = ""
-            return Response(
-                {"error": "Gemini API error.", "details": error_body},
-                status=status.HTTP_502_BAD_GATEWAY,
-            )
-        except Exception:
-            return Response(
-                {"error": "Gemini request failed."},
-                status=status.HTTP_502_BAD_GATEWAY,
-            )
+#         try:
+#             with urllib.request.urlopen(api_request, timeout=20) as response:
+#                 body = response.read().decode("utf-8")
+#             data = json.loads(body)
+#         except urllib.error.HTTPError as exc:
+#             error_body = ""
+#             try:
+#                 error_body = exc.read().decode("utf-8")
+#             except Exception:
+#                 error_body = ""
+#             return Response(
+#                 {"error": "Gemini API error.", "details": error_body},
+#                 status=status.HTTP_502_BAD_GATEWAY,
+#             )
+#         except Exception:
+#             return Response(
+#                 {"error": "Gemini request failed."},
+#                 status=status.HTTP_502_BAD_GATEWAY,
+#             )
 
-        reply = ""
-        try:
-            reply = data["candidates"][0]["content"]["parts"][0]["text"]
-        except (KeyError, IndexError, TypeError):
-            reply = ""
+#         reply = ""
+#         try:
+#             reply = data["candidates"][0]["content"]["parts"][0]["text"]
+#         except (KeyError, IndexError, TypeError):
+#             reply = ""
 
-        if not reply:
-            return Response(
-                {"error": "Empty response from Gemini."},
-                status=status.HTTP_502_BAD_GATEWAY,
-            )
+#         if not reply:
+#             return Response(
+#                 {"error": "Empty response from Gemini."},
+#                 status=status.HTTP_502_BAD_GATEWAY,
+#             )
 
-        return Response({"reply": reply})
+#         return Response({"reply": reply})
 
 
 def s_courses(request):
@@ -283,13 +286,24 @@ def s_course_detail(request, course_id):
 
 
 def logout(request):
-    logout(request)
-    return render(request, 'dashboard.html')
+    auth_logout(request)
+    return render(request, 'user_login.html')
+
+
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-import google.generativeai as genai
-import os, json
+from google import genai
+import json
+import os
+
+
+def _get_gemini_client():
+    api_key = getattr(settings, "GEMINI_API_KEY", None) or os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        return None
+
+    return genai.Client(api_key=api_key)
 
 @csrf_exempt
 def chatbot(request):
@@ -297,21 +311,32 @@ def chatbot(request):
         return JsonResponse({"error": "POST only"}, status=405)
 
     try:
-        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-
-        model = genai.GenerativeModel("models/gemini-flash-latest")
-
+        client = _get_gemini_client()
+        if client is None:
+            return JsonResponse({"error": "Server configuration error: Missing API Key."}, status=500)
 
         data = json.loads(request.body)
-        user_msg = data.get("message", "")
+        user_msg = data.get("message", "").strip()
 
-        response = model.generate_content(user_msg)
+        if not user_msg:
+            return JsonResponse({"reply": "Please ask a question."})
 
-        return JsonResponse({"reply": response.text})
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=user_msg,
+        )
+
+        return JsonResponse({"reply": response.text or ""})
 
     except Exception as e:
-        print("❌ ERROR:", e)
-        return JsonResponse({"error": str(e)}, status=500)
+        print("❌ Gemini error:", e)
+        return JsonResponse(
+            {"reply": "AI service temporarily unavailable. Please try again later."},
+            status=500
+        )
+
+
+
 
 
 def s_grades(request):
@@ -333,3 +358,85 @@ def s_study_materials(request):
 def s_upload_projects(request):
     """Display project upload page"""
     return render(request, 's_upload_projects.html')
+
+def s_quizzes(request):
+    """Display quiz generation page"""
+    return render(request, 's_quizzes.html')
+
+@csrf_exempt
+def generate_quiz(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST only"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        topic = data.get("topic", "").strip()
+
+        if not topic:
+            return JsonResponse({"error": "Topic is required."}, status=400)
+
+        client = _get_gemini_client()
+        if client is None:
+            return JsonResponse({"error": "Server configuration error: Missing API Key."}, status=500)
+
+        prompt = f"""
+        Generate a quiz about "{topic}".
+        Create 5 multiple choice questions.
+        Format the output strictly as a JSON object with this structure:
+        {{
+            "quiz": [
+                {{
+                    "question": "Question text here",
+                    "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+                    "correct_index": 0 
+                }}
+            ]
+        }}
+        Importantly: 
+        - provide exactly 4 options for each question.
+        - correct_index should be the 0-based index of the correct answer in the options array.
+        - The "options" array must contain strings.
+        - Do not include any markdown formatting (like ```json) in the response, just the raw JSON string.
+        """
+
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+        )
+        text_response = response.text.strip()
+        
+        # Clean up potential markdown code blocks if the model includes them despite instructions
+        if text_response.startswith("```json"):
+            text_response = text_response[7:]
+        elif text_response.startswith("```"):
+            text_response = text_response[3:]
+        
+        if text_response.endswith("```"):
+            text_response = text_response[:-3]
+            
+        text_response = text_response.strip()
+
+        try:
+            quiz_data = json.loads(text_response)
+        except json.JSONDecodeError:
+            # Fallback: try to find JSON object if extra text exists
+            start_idx = text_response.find('{')
+            end_idx = text_response.rfind('}')
+            if start_idx != -1 and end_idx != -1:
+                json_str = text_response[start_idx:end_idx+1]
+                quiz_data = json.loads(json_str)
+            else:
+                raise
+        
+        return JsonResponse(quiz_data)
+
+    except json.JSONDecodeError:
+        print("❌ JSON Decode Error:", text_response)
+        return JsonResponse({"error": "Failed to generate valid quiz format. Try again."}, status=500)
+    except Exception as e:
+        print("❌ Quiz Generation Error:", e)
+        return JsonResponse(
+            {"error": str(e)},
+            status=500
+        )
+
